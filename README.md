@@ -1,31 +1,40 @@
-# RFID Card Read/Write (Arduino + MFRC522)
+# RFID 카드 읽기/쓰기 (Arduino + MFRC522)
 
-This sketch demonstrates writing/reading multiple data types to a MIFARE Classic card using MFRC522.
+이 스케치는 MFRC522 리더를 이용해 MIFARE Classic 카드에 문자열, 정수, 구조체 등 여러 타입의 데이터를 쓰고/읽는 예제입니다. 학습 목적으로 각 단계(챕터)의 코드를 주석으로 보존하며, 변경점에는 `[CH2] ~ [CH7]` 태그를 달아 차이를 쉽게 확인할 수 있습니다.
 
-Chapters implemented in-code with comments:
-- CH2: Basic write flow
-- CH3: Refactor to helpers `checkAuth`, `writeString`
-- CH4: Read string `readString`
-- CH5: Write integer `writeInteger`
-- CH6: Read integer `readInteger`
-- CH7: Composite struct `TagData` write/read across two blocks
+구성 요소
+- 보드: Arduino (UNO 기준, 다른 보드도 SPI 핀만 맞추면 가능)
+- 리더: MFRC522 (RC522)
+- 라이브러리: `MFRC522`, `SPI`
 
-Commands via Serial (9600 baud):
-- `ws` → write string to block 60
-- `wi` → write 16-bit integer to block 61
-- `rs` → read string from block 60
-- `ri` → read integer from block 61
-- `wt` → write struct `TagData` to blocks 56–57
-- `rt` → read struct `TagData` from blocks 56–57
-
-Wiring
-- `SS` (SDA) → D10
+배선
+- `SS(SDA)` → D10
 - `RST` → D9
-- Uses hardware `SPI` pins for your board.
+- 나머지 `SCK/MOSI/MISO`는 보드의 하드웨어 SPI 핀 사용
 
-Dependencies
-- Arduino library: `MFRC522`
+시리얼 명령어 (9600 baud)
+- `ws`  문자열 쓰기: 블록 60에 기본 문자열 기록
+- `wi`  정수 쓰기: 블록 61에 16비트 정수(예: 32767) 기록
+- `rs`  문자열 읽기: 블록 60에서 읽기
+- `ri`  정수 읽기: 블록 61에서 읽기
+- `wt`  구조체 쓰기: `TagData`를 블록 56–57(연속 두 블록)에 기록
+- `rt`  구조체 읽기: 블록 56–57에서 `TagData` 읽기 후 항목별 출력
 
-Notes
-- The sketch preserves earlier chapter code as comments with tags `[CH2]..[CH7]` for learning diff.
-- Adjust block indices as needed based on your card layout.
+챕터 구성 (코드 내 주석으로 구분)
+- CH2: 기본 쓰기 흐름
+- CH3: `checkAuth`, `writeString` 헬퍼 추가 및 리팩터링
+- CH4: 문자열 읽기 `readString`
+- CH5: 정수 쓰기 `writeInteger`
+- CH6: 정수 읽기 `readInteger`
+- CH7: 구조체 `TagData`(name/total/payment) 2블록 단위 읽기/쓰기
+
+사용 방법
+1) Arduino IDE에서 라이브러리(MFRC522) 설치
+2) 보드와 포트 선택 후 스케치 업로드
+3) 시리얼 모니터(9600, 줄바꿈 전송)에서 명령 입력
+   - 카드/태그를 리더에 올려놓은 상태에서 `ws`, `wi`, `rs`, `ri`, `wt`, `rt` 실행
+
+참고 사항
+- 블록 인덱스(56, 57, 60, 61)는 예시이므로 카드 레이아웃에 맞게 조정 가능합니다.
+- 보안 키는 기본값(0xFF)으로 동작하도록 되어 있습니다. 실제 서비스 환경에서는 키를 변경해주세요.
+- 카드 종류가 `MIFARE Classic`이 아닌 경우 동작이 다를 수 있습니다.
