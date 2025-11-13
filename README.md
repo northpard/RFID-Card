@@ -85,87 +85,11 @@
   - 주요 변경: `TagData` 구조체 정의, `writeTagData`/`readTagData` 추가, `wt`·`rt` 명령이 블록 56–57에 `name/total/payment`를 연속 기록하고 다시 읽어 필드별로 출력.
 
 주요 헬퍼 함수
-- `checkAuth(index, key)`  
-  ```cpp
-  MFRC522::StatusCode checkAuth(int index, MFRC522::MIFARE_Key key) {
-    MFRC522::StatusCode status = rc522.PCD_Authenticate(
-        MFRC522::PICC_CMD_MF_AUTH_KEY_A, index, &key, &(rc522.uid));
-    if (status != MFRC522::STATUS_OK) {
-      Serial.println(rc522.GetStatusCodeName(status));
-    }
-    return status;
-  }
-  ```
-- `writeString` / `readString`  
-  ```cpp
-  MFRC522::StatusCode writeString(int index, MFRC522::MIFARE_Key key, String data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    char buffer[16]; memset(buffer, 0x00, sizeof(buffer));
-    data.toCharArray(buffer, data.length() + 1);
-    return rc522.MIFARE_Write(index, (byte*)&buffer, 16);
-  }
-
-  MFRC522::StatusCode readString(int index, MFRC522::MIFARE_Key key, String& data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    byte buffer[18], length = 18;
-    status = rc522.MIFARE_Read(index, buffer, &length);
-    if (status == MFRC522::STATUS_OK) {
-      data = String((char*)buffer);
-    }
-    return status;
-  }
-  ```
-- `writeInteger` / `readInteger`  
-  ```cpp
-  void toBytes(byte* buffer, int data, int offset = 0) {
-    buffer[offset] = data & 0xFF;
-    buffer[offset + 1] = (data >> 8) & 0xFF;
-  }
-  int toInteger(byte* buffer, int offset = 0) {
-    return ((buffer[offset + 1] << 8) | buffer[offset]);
-  }
-
-  MFRC522::StatusCode writeInteger(int index, MFRC522::MIFARE_Key key, int data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    byte buffer[16]; memset(buffer, 0x00, sizeof(buffer));
-    toBytes(buffer, data);
-    return rc522.MIFARE_Write(index, buffer, sizeof(buffer));
-  }
-
-  MFRC522::StatusCode readInteger(int index, MFRC522::MIFARE_Key key, int& data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    byte buffer[18], length = 18;
-    status = rc522.MIFARE_Read(index, buffer, &length);
-    if (status == MFRC522::STATUS_OK) {
-      data = toInteger(buffer);
-    }
-    return status;
-  }
-  ```
-- `writeTagData` / `readTagData`  
-  ```cpp
-  struct TagData { char name[16]; long total; long payment; };
-
-  MFRC522::StatusCode writeTagData(int index, MFRC522::MIFARE_Key key, TagData data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    byte buffer[32]; memset(buffer, 0x00, sizeof(buffer));
-    memcpy(buffer, &data, sizeof(data));
-    for (int i = 0; i < 2; i++) {
-      status = rc522.MIFARE_Write(index + i, buffer + (i * 16), 16);
-    }
-    return status;
-  }
-
-  MFRC522::StatusCode readTagData(int index, MFRC522::MIFARE_Key key, TagData& data) {
-    MFRC522::StatusCode status = checkAuth(index, key);
-    byte buffer[34], length = 18;
-    for (int i = 0; i < 2; i++) {
-      status = rc522.MIFARE_Read(index + i, buffer + (i * 16), &length);
-    }
-    memcpy(&data, buffer, sizeof(data));
-    return status;
-  }
-  ```
+- `checkAuth` : 지정 블록에 접근하기 전에 기본 키 A로 인증을 수행하고 실패 시 오류 메시지를 출력.
+- `toBytes` / `toInteger` : 16비트 정수를 리틀엔디언으로 버퍼에 변환하거나 다시 정수로 복원.
+- `writeString` / `readString` : 문자열을 16바이트 블록에 기록하거나 해당 블록에서 읽어 `String`으로 반환.
+- `writeInteger` / `readInteger` : 정수를 16바이트 버퍼(나머지 0 패딩)에 써 넣고 다시 읽어 복원.
+- `writeTagData` / `readTagData` : `TagData(name, total, payment)` 구조체를 32바이트 버퍼에 담아 연속 두 블록에 기록하고 다시 읽어 필드별로 복원.
 
 사용 방법
 1) Arduino IDE에서 라이브러리(MFRC522) 설치
