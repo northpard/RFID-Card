@@ -31,10 +31,29 @@
 챕터별 상세 변경
 - CH2  
   - 목적: RC522 태그에 문자열을 직접 쓰는 최소 동작을 확인.  
-  - 주요 변경: `loop()`에서 `w` 명령을 직접 처리하고, 블록 60 인증 후 고정 문자열을 `MIFARE_Write`로 기록.
+  - 주요 변경: `loop()`에서 `w` 명령을 직접 처리하고, 블록 60 인증 후 고정 문자열을 `MIFARE_Write`로 기록.  
+    ```cpp
+    if (!rc522.PICC_IsNewCardPresent()) return;
+    if (!rc522.PICC_ReadCardSerial()) return;
+    status = rc522.PCD_Authenticate(..., 60, &key, &(rc522.uid));
+    String name = "nomaefg";
+    name.toCharArray(data, name.length() + 1);
+    status = rc522.MIFARE_Write(60, (byte*)&data, 16);
+    ```
 - CH3  
   - 목적: 중복 코드를 줄이고 재사용 가능한 기본 구조를 마련.  
-  - 주요 변경: `checkAuth`, `writeString` 헬퍼를 추가하고, `switch` 기반 명령 처리로 `loop()`를 리팩터링.
+  - 주요 변경: `checkAuth`, `writeString` 헬퍼를 추가하고, `switch` 기반 명령 처리로 `loop()`를 리팩터링.  
+    ```cpp
+    switch (cmd.charAt(0)) {
+      case 'w':
+        status = writeString(60, key, "nomaefg");
+        break;
+    }
+
+    MFRC522::StatusCode checkAuth(int index, MFRC522::MIFARE_Key key) {
+      return rc522.PCD_Authenticate(PICC_CMD_MF_AUTH_KEY_A, index, &key, &(rc522.uid));
+    }
+    ```
 - CH4  
   - 목적: 저장된 문자열을 읽어 검증할 수 있는 기능 추가.  
   - 주요 변경: `readString` 함수 도입, `r` 명령 및 `rs` 서브커맨드를 통해 블록 60을 읽고 시리얼에 출력.
