@@ -56,7 +56,24 @@
     ```
 - CH4  
   - 목적: 저장된 문자열을 읽어 검증할 수 있는 기능 추가.  
-  - 주요 변경: `readString` 함수 도입, `r` 명령 및 `rs` 서브커맨드를 통해 블록 60을 읽고 시리얼에 출력.
+  - 주요 변경: `readString` 함수 도입, `r` 명령 및 `rs` 서브커맨드를 통해 블록 60을 읽고 시리얼에 출력.  
+    ```cpp
+    case 'r':
+      switch (cmd.charAt(1)) {
+        case 's':
+          status = readString(60, key, s_data);
+          Serial.println(s_data);
+          break;
+      }
+
+    MFRC522::StatusCode readString(int index, MFRC522::MIFARE_Key key, String& data) {
+      status = checkAuth(index, key);
+      byte buffer[18], length = 18;
+      status = rc522.MIFARE_Read(index, buffer, &length);
+      data = String((char*)buffer);
+      return status;
+    }
+    ```
 - CH5  
   - 목적: 문자열뿐 아니라 정수 데이터도 카드에 저장·조회 가능하도록 확장.  
   - 주요 변경: `writeInteger`/`readInteger`, `toBytes`/`toInteger` 함수 추가, `wi`·`ri` 명령으로 블록 61에 16비트 정수를 Little Endian으로 입·출력.
