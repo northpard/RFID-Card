@@ -36,7 +36,7 @@
     if (!rc522.PICC_IsNewCardPresent()) return;
     if (!rc522.PICC_ReadCardSerial()) return;
     status = rc522.PCD_Authenticate(..., 60, &key, &(rc522.uid));
-    String name = "nomaefg";
+    String name = "clyde's";
     name.toCharArray(data, name.length() + 1);
     status = rc522.MIFARE_Write(60, (byte*)&data, 16);
     ```
@@ -46,7 +46,7 @@
     ```cpp
     switch (cmd.charAt(0)) {
       case 'w':
-        status = writeString(60, key, "nomaefg");
+        status = writeString(60, key, "clyde's");
         break;
     }
 
