@@ -28,6 +28,26 @@
 - CH6: 정수 읽기 `readInteger`
 - CH7: 구조체 `TagData`(name/total/payment) 2블록 단위 읽기/쓰기
 
+챕터별 상세 변경
+- CH2  
+  - 목적: RC522 태그에 문자열을 직접 쓰는 최소 동작을 확인.  
+  - 주요 변경: `loop()`에서 `w` 명령을 직접 처리하고, 블록 60 인증 후 고정 문자열을 `MIFARE_Write`로 기록.
+- CH3  
+  - 목적: 중복 코드를 줄이고 재사용 가능한 기본 구조를 마련.  
+  - 주요 변경: `checkAuth`, `writeString` 헬퍼를 추가하고, `switch` 기반 명령 처리로 `loop()`를 리팩터링.
+- CH4  
+  - 목적: 저장된 문자열을 읽어 검증할 수 있는 기능 추가.  
+  - 주요 변경: `readString` 함수 도입, `r` 명령 및 `rs` 서브커맨드를 통해 블록 60을 읽고 시리얼에 출력.
+- CH5  
+  - 목적: 문자열뿐 아니라 정수 데이터도 카드에 저장·조회 가능하도록 확장.  
+  - 주요 변경: `writeInteger`/`readInteger`, `toBytes`/`toInteger` 함수 추가, `wi`·`ri` 명령으로 블록 61에 16비트 정수를 Little Endian으로 입·출력.
+- CH6  
+  - 목적: 읽기 명령을 분리·보강하고 임시 버퍼 관리를 개선.  
+  - 주요 변경: `loop()`에서 `rs/ri` 처리 시 임시 변수(`s_data`, `i_data`)를 사용하고, `readInteger`/`readString` 성공 시 값을 시리얼에 출력.
+- CH7  
+  - 목적: 구조체 형태의 복합 데이터를 두 블록에 나누어 저장·조회하는 고급 예제 구현.  
+  - 주요 변경: `TagData` 구조체 정의, `writeTagData`/`readTagData` 추가, `wt`·`rt` 명령이 블록 56–57에 `name/total/payment`를 연속 기록하고 다시 읽어 필드별로 출력.
+
 사용 방법
 1) Arduino IDE에서 라이브러리(MFRC522) 설치
 2) 보드와 포트 선택 후 스케치 업로드
