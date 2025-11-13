@@ -100,7 +100,20 @@
     ```
 - CH6  
   - 목적: 읽기 명령을 분리·보강하고 임시 버퍼 관리를 개선.  
-  - 주요 변경: `loop()`에서 `rs/ri` 처리 시 임시 변수(`s_data`, `i_data`)를 사용하고, `readInteger`/`readString` 성공 시 값을 시리얼에 출력.
+  - 주요 변경: `loop()`에서 `rs/ri` 처리 시 임시 변수(`s_data`, `i_data`)를 사용하고, `readInteger`/`readString` 성공 시 값을 시리얼에 출력.  
+    ```cpp
+    case 'r':
+      switch (cmd.charAt(1)) {
+        case 's':
+          status = readString(60, key, s_data);
+          Serial.println(s_data);
+          break;
+        case 'i':
+          status = readInteger(61, key, i_data);
+          Serial.println(i_data);
+          break;
+      }
+    ```
 - CH7  
   - 목적: 구조체 형태의 복합 데이터를 두 블록에 나누어 저장·조회하는 고급 예제 구현.  
   - 주요 변경: `TagData` 구조체 정의, `writeTagData`/`readTagData` 추가, `wt`·`rt` 명령이 블록 56–57에 `name/total/payment`를 연속 기록하고 다시 읽어 필드별로 출력.
