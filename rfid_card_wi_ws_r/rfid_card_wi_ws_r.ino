@@ -63,7 +63,7 @@ void loop()
   // char data[16];
   // memset(data, 0x00, sizeof(data));
   // // string to char array
-  // String name = "nomaefg";
+  // String name = "clyde's";
   // name.toCharArray(data, name.length() + 1);
   // // write data
   // status = rc522.MIFARE_Write(index, (byte*)&data, 16);
@@ -98,7 +98,7 @@ void loop()
     // {
     //   case 'w':
     //     Serial.println("write");
-    //     status = writeString(60, key, "nomaefg");
+    //     status = writeString(60, key, "clyde's");
     //     break;
     //   default:
     //     Serial.println("unknown");
@@ -112,7 +112,7 @@ void loop()
       case 'w':
         // [CH4] original write branch
         // Serial.println("write");
-        // status = writeString(60, key, "nomaefg");
+        // status = writeString(60, key, "clyde's");
         // break;
 
         // [CH5] support subtype: ws (string) / wi (integer)
@@ -121,7 +121,7 @@ void loop()
         {
           case 's':
             Serial.println("string");
-            status = writeString(60, key, "nomaefg");
+            status = writeString(60, key, "clyde's");
             break;
           case 'i':
             Serial.println("integer");
@@ -130,7 +130,7 @@ void loop()
             break;
           case 't':
             Serial.println("struct");
-            s_temp = "nomaefg";
+            s_temp = "clyde's";
             s_temp.toCharArray(t_data.name, s_temp.length() + 1);
             t_data.total = -2147483647L;
             t_data.payment = 2000000000L;
