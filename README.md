@@ -76,7 +76,28 @@
     ```
 - CH5  
   - 목적: 문자열뿐 아니라 정수 데이터도 카드에 저장·조회 가능하도록 확장.  
-  - 주요 변경: `writeInteger`/`readInteger`, `toBytes`/`toInteger` 함수 추가, `wi`·`ri` 명령으로 블록 61에 16비트 정수를 Little Endian으로 입·출력.
+  - 주요 변경: `writeInteger`/`readInteger`, `toBytes`/`toInteger` 함수 추가, `wi`·`ri` 명령으로 블록 61에 16비트 정수를 Little Endian으로 입·출력.  
+    ```cpp
+    case 'w':
+      if (cmd.charAt(1) == 'i') {
+        status = writeInteger(61, key, 32767);
+        rc522.PICC_DumpToSerial(&(rc522.uid));
+      }
+      break;
+    case 'r':
+      if (cmd.charAt(1) == 'i') {
+        status = readInteger(61, key, i_data);
+        Serial.println(i_data); // 32767 출력
+      }
+      break;
+
+    MFRC522::StatusCode writeInteger(int index, MFRC522::MIFARE_Key key, int data) {
+      MFRC522::StatusCode status = checkAuth(index, key);
+      byte buffer[16]; memset(buffer, 0x00, sizeof(buffer));
+      toBytes(buffer, data); // LSB-first 로 2바이트 채움
+      return rc522.MIFARE_Write(index, buffer, sizeof(buffer));
+    }
+    ```
 - CH6  
   - 목적: 읽기 명령을 분리·보강하고 임시 버퍼 관리를 개선.  
   - 주요 변경: `loop()`에서 `rs/ri` 처리 시 임시 변수(`s_data`, `i_data`)를 사용하고, `readInteger`/`readString` 성공 시 값을 시리얼에 출력.
